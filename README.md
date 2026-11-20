@@ -17,3 +17,13 @@ Desde administración se pueden consultar y copiar los datos, exportar CSV y mar
 Para activar el sitio: GitHub -> Settings -> Pages -> Build and deployment -> Source: GitHub Actions. Si Pages aún no estaba habilitado, selecciónalo y ejecuta el workflow "Publicar Facturas Nicole".
 
 Privacidad: información personal de clientes. No usar para marketing sin una base legal separada. Definir un plazo de conservación y procedimiento de rectificación/eliminación.
+
+
+## Fotografías de comprobantes de compra
+- El cliente puede tomar una fotografía o seleccionar una de su galería desde el formulario público. Es **opcional**, no sustituye los datos obligatorios.
+- El navegador convierte la imagen a JPG, la reduce hasta un máximo de 2 MB y evita conservar metadatos EXIF habituales del archivo original.
+- La API valida la cabecera binaria, el tipo y el tamaño, y guarda la fotografía en el bucket privado `nicole-invoice-receipts`.
+- Cada foto queda asociada a un registro en `invoice_client_registrations` mediante `receipt_storage_path`, `receipt_mime` y `receipt_uploaded_at`.
+- La administración puede pulsar **Ver foto de la compra**. Se genera una URL firmada y temporal de 120 segundos para visualizar el archivo.
+- Los visitantes no tienen permisos de consulta sobre la tabla ni acceso directo a los archivos. El CSV indica si hay foto, pero nunca revela la ruta privada.
+- La imagen permite comprobar visualmente los productos o cantidades, **no extrae los productos automáticamente** y **no constituye una factura autorizada por el SRI**.
