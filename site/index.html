@@ -1,39 +1,198 @@
-<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="referrer" content="strict-origin-when-cross-origin"><title>Datos para tu factura | Nicole Encajes</title><link rel="stylesheet" href="./styles.css?v=3"></head><body>
-<header class="brand-header"><div class="head"><img src="./logo-nicole.webp" class="brand-logo" alt="Nicole Encajes" width="72" height="72"></div></header>
-<main class="compact-main"><div class="card form-card">
-<div class="form-intro"><h1>Datos para tu factura</h1><p class="lead">Completa tus datos para recibir tu factura por correo electrónico. No necesitas contraseña.</p></div>
-<section id="confirmed" class="success hidden" role="status" aria-live="polite"><h2>¡Datos recibidos!</h2><p>Tu información quedó registrada. Nicole Encajes podrá consultarla para gestionar tu factura.</p><button id="again" class="secondary" type="button">Registrar otra persona</button></section>
-<form id="form"><div class="grid">
-<div class="field"><label for="id_type">Tipo de identificación <span class="required">*</span></label><select id="id_type" name="id_type" required><option value="cedula">Cédula</option><option value="ruc">RUC</option><option value="pasaporte">Pasaporte</option></select></div>
-<div class="field"><label for="id_number">Número de identificación <span class="required">*</span></label><input id="id_number" name="id_number" maxlength="20" required placeholder="Tu cédula, RUC o pasaporte"></div>
-<div class="field span2"><label for="full_name">Nombres completos o razón social <span class="required">*</span></label><input id="full_name" name="full_name" maxlength="200" autocomplete="name" required></div>
-<div class="field"><label for="email">Correo electrónico <span class="required">*</span></label><input id="email" name="email" type="email" autocomplete="email" maxlength="200" required placeholder="ejemplo@correo.com"></div>
-<div class="field"><label for="phone">Celular / WhatsApp <span class="required">*</span></label><input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="30" required placeholder="0991234567"></div>
-<div class="field span2"><label for="address">Dirección (opcional)</label><input id="address" name="address" maxlength="240" autocomplete="street-address" placeholder="Ciudad, calle y número"></div>
-<div class="field span2"><label for="receipt">Foto del comprobante de compra (opcional)</label>
-<input type="file" id="receipt" name="receipt" accept="image/*" aria-describedby="photohelp" style="padding:10px">
-<small id="photohelp">Toma o adjunta una foto legible de los productos y valores. Máximo 2 MB después de comprimir.</small>
-<img id="photoPreview" class="hidden" alt="Vista previa de la foto del comprobante" style="margin-top:10px;max-width:100%;max-height:300px;object-fit:contain;border:1px solid #dfd2dd;border-radius:8px">
-</div>
-</div>
-<div class="honeypot" aria-hidden="true"><label for="website">Dejar vacío</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
-<label class="check"><input id="privacy_accepted" name="privacy_accepted" type="checkbox" required><span>Acepto que Nicole Encajes utilice mis datos y, si adjunto una foto, la imagen de mi comprobante de compra exclusivamente para gestionar mi facturación, contactarme por ese motivo y remitirme el comprobante. <span class="required">*</span></span></label>
-<p id="error" class="error hidden" role="alert"></p><button type="submit" id="submit" style="width:100%">Guardar mis datos</button></form></div>
-<div class="notice"><strong>Privacidad:</strong> tus datos y tu fotografía, si la adjuntas, son privados y solo se utilizan para gestionar tu factura. Para solicitar una corrección, contacta a Nicole Encajes. Este formulario no emite facturas automáticamente.</div></main><footer>Nicole Encajes · Ecuador</footer>
-<script>
-const f=document.getElementById("form"),err=document.getElementById("error"),btn=document.getElementById("submit");
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Datos para tu factura | Nicole Encajes</title>
+  <link rel="stylesheet" href="./styles.css?v=4">
+</head>
+<body>
+  <header class="brand-header">
+    <div class="head"><img src="./logo-nicole.webp" class="brand-logo" width="72" height="72" alt="Nicole Encajes"></div>
+  </header>
+  <main class="wizard-main">
+    <div class="card wizard-card">
+      <div class="form-intro">
+        <p class="eyebrow">NICOLE ENCAJES</p>
+        <h1>Datos para tu factura</h1>
+        <p class="lead">Regístrate en tres pasos para recibir tu factura por correo. Sin contraseña.</p>
+      </div>
 
-const photoInput=document.getElementById("receipt"),photoPreview=document.getElementById("photoPreview");
-let photoPreviewUrl=null;
-photoInput.addEventListener("change",()=>{
- if(photoPreviewUrl)URL.revokeObjectURL(photoPreviewUrl);
- photoPreview.classList.add("hidden");photoPreviewUrl=null;
- if(photoInput.files?.[0]){
-   photoPreviewUrl=URL.createObjectURL(photoInput.files[0]);
-   photoPreview.src=photoPreviewUrl;photoPreview.classList.remove("hidden");
- }
-});
-async function photoPayload(file){
+      <section id="confirmed" class="success hidden completion" role="status" aria-live="polite">
+        <div class="completion-mark" aria-hidden="true">✓</div>
+        <h2>¡Datos registrados!</h2>
+        <p>Recibimos tus datos para facturación. Nicole Encajes los revisará para preparar y enviarte la factura.</p>
+        <button id="again" class="secondary" type="button">Registrar otra persona</button>
+      </section>
+
+      <div id="wizard" class="wizard">
+        <div class="step-heading">
+          <span id="stepCount" aria-live="polite">Paso 1 de 3</span>
+          <span>Los campos con * son obligatorios</span>
+        </div>
+        <nav class="stepper" aria-label="Progreso del registro">
+          <div class="step-tab active" data-indicator="0" aria-current="step">
+            <span class="step-number">1</span><span class="step-name">Identificación</span>
+          </div>
+          <div class="step-tab" data-indicator="1">
+            <span class="step-number">2</span><span class="step-name">Contacto</span>
+          </div>
+          <div class="step-tab" data-indicator="2">
+            <span class="step-number">3</span><span class="step-name">Comprobante</span>
+          </div>
+        </nav>
+
+        <form id="form" novalidate>
+          <fieldset class="wizard-page" data-step="0">
+            <legend class="wizard-title" tabindex="-1">¿A nombre de quién va la factura?</legend>
+            <p class="wizard-help">Ingresa los datos que deben aparecer en tu factura.</p>
+            <div class="grid">
+              <div class="field">
+                <label for="id_type">Tipo de identificación <span class="required">*</span></label>
+                <select name="id_type" id="id_type" required>
+                  <option value="cedula">Cédula</option>
+                  <option value="ruc">RUC</option>
+                  <option value="pasaporte">Pasaporte</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="id_number">Número de identificación <span class="required">*</span></label>
+                <input name="id_number" id="id_number" type="text" inputmode="numeric" maxlength="13" required autocomplete="off" placeholder="Ej. 1712345678" pattern="[0-9]{10}" title="Ingresa los 10 dígitos de tu cédula">
+              </div>
+              <div class="field span2">
+                <label for="full_name">Nombres completos o razón social <span class="required">*</span></label>
+                <input name="full_name" id="full_name" type="text" maxlength="200" minlength="3" autocomplete="name" required placeholder="Como deben aparecer en la factura">
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="wizard-page hidden" data-step="1">
+            <legend class="wizard-title" tabindex="-1">¿Dónde podemos enviarte tu factura?</legend>
+            <p class="wizard-help">El correo y el número de celular son obligatorios.</p>
+            <div class="grid">
+              <div class="field span2">
+                <label for="email">Correo electrónico <span class="required">*</span></label>
+                <input name="email" id="email" type="email" maxlength="200" autocomplete="email" required placeholder="ejemplo@correo.com">
+              </div>
+              <div class="field span2">
+                <label for="phone">Celular / WhatsApp <span class="required">*</span></label>
+                <input name="phone" id="phone" type="tel" inputmode="tel" maxlength="30" autocomplete="tel" required placeholder="0991234567">
+              </div>
+              <div class="field span2">
+                <label for="address">Dirección <span class="optional">(opcional)</span></label>
+                <input name="address" id="address" type="text" maxlength="240" autocomplete="street-address" placeholder="Ciudad, calle y número">
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="wizard-page hidden" data-step="2">
+            <legend class="wizard-title" tabindex="-1">Adjunta tu comprobante</legend>
+            <p class="wizard-help">Si tienes una foto de tu compra, súbela para identificar los artículos y cantidades.</p>
+            <div class="upload-box">
+              <label for="receipt" class="upload-label">Foto del comprobante <span class="optional">(opcional)</span></label>
+              <input type="file" id="receipt" name="receipt" accept="image/*" aria-describedby="photohelp">
+              <small id="photohelp">Puedes tomar una foto o elegirla de tu galería. JPG, PNG o WebP; se comprime al enviarla.</small>
+              <img id="photoPreview" class="hidden" alt="Vista previa del comprobante de compra">
+            </div>
+            <div class="review-box">
+              <p class="review-title">Verifica tus datos</p>
+              <dl>
+                <div><dt>Cliente</dt><dd id="summaryName"></dd></div>
+                <div><dt>Identificación</dt><dd id="summaryId"></dd></div>
+                <div><dt>Correo</dt><dd id="summaryEmail"></dd></div>
+                <div><dt>Celular</dt><dd id="summaryPhone"></dd></div>
+              </dl>
+            </div>
+            <label class="check privacy-check" for="privacy_accepted">
+              <input type="checkbox" id="privacy_accepted" name="privacy_accepted" required>
+              <span>Acepto que Nicole Encajes utilice mis datos y, si adjunto una foto, la imagen del comprobante para gestionar mi facturación y remitirme la factura. <span class="required">*</span></span>
+            </label>
+          </fieldset>
+
+          <div class="honeypot" aria-hidden="true"><label for="website">No completar</label><input type="text" name="website" id="website" tabindex="-1" autocomplete="off"></div>
+          <p id="error" class="error hidden" role="alert"></p>
+          <div class="wizard-actions">
+            <button type="button" id="previous" class="secondary hidden">Anterior</button>
+            <button type="button" id="next">Continuar <span aria-hidden="true">→</span></button>
+            <button type="submit" id="submit" class="hidden">Guardar mis datos</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <p class="privacy-footnote">Tus datos y fotografías son privados y se utilizan para gestionar la factura. Este formulario no emite comprobantes del SRI automáticamente.</p>
+  </main>
+  <footer>Nicole Encajes · Ecuador</footer>
+  <script>
+  const API = "https://oppaviqjlyrnkpxjsfvo.supabase.co/functions/v1/invoice-api";
+  const $ = id => document.getElementById(id);
+  const f = $("form"), err = $("error"), btn = $("submit");
+  const pages = [...document.querySelectorAll(".wizard-page")];
+  const indicators = [...document.querySelectorAll(".step-tab")];
+  const photoInput = $("receipt"), photoPreview = $("photoPreview");
+  let currentStep = 0, sending = false, photoPreviewUrl = null;
+
+  function showStep(index, focusHeading = true) {
+    currentStep = Math.max(0, Math.min(2, index));
+    pages.forEach((page,i)=>page.classList.toggle("hidden",i!==currentStep));
+    indicators.forEach((tab,i)=>{
+      tab.classList.toggle("active",i===currentStep);
+      tab.classList.toggle("done",i<currentStep);
+      if (i===currentStep) tab.setAttribute("aria-current","step");
+      else tab.removeAttribute("aria-current");
+    });
+    $("stepCount").textContent = "Paso " + (currentStep+1) + " de 3";
+    $("previous").classList.toggle("hidden",currentStep===0);
+    $("next").classList.toggle("hidden",currentStep===2);
+    btn.classList.toggle("hidden",currentStep!==2);
+    err.textContent = "";err.classList.add("hidden");
+    if (currentStep===2) updateSummary();
+    if (focusHeading) {
+      pages[currentStep].querySelector(".wizard-title").focus({preventScroll:true});
+      window.scrollTo({top:0,behavior:"smooth"});
+    }
+  }
+  function updateSummary() {
+    $("summaryName").textContent = $("full_name").value.trim() || "—";
+    $("summaryId").textContent = $("id_type").selectedOptions[0].text + ": " + $("id_number").value.trim();
+    $("summaryEmail").textContent = $("email").value.trim() || "—";
+    $("summaryPhone").textContent = $("phone").value.trim() || "—";
+  }
+  function validateStep(index) {
+    const controls = [...pages[index].querySelectorAll("input,select")];
+    if (index===1) {
+      const phone = $("phone");
+      const cleaned = phone.value.replace(/[\s()-]+/g,"");
+      phone.setCustomValidity(/^\+?[0-9]{9,15}$/.test(cleaned) ? "" : "Ingresa un número celular válido de 9 a 15 dígitos");
+    }
+    for (const control of controls) {
+      if (!control.checkValidity()) {
+        control.reportValidity();
+        return false;
+      }
+    }
+    return true;
+  }
+  $("phone").addEventListener("input",()=> $("phone").setCustomValidity(""));
+  $("id_type").addEventListener("change",()=>{
+    const type=$("id_type").value, number=$("id_number");
+    number.inputMode=type==="pasaporte"?"text":"numeric";
+    number.maxLength=type==="pasaporte"?20:type==="ruc"?13:10;
+    number.pattern=type==="pasaporte"?"[A-Za-z0-9]{5,20}":type==="ruc"?"[0-9]{13}":"[0-9]{10}";
+    number.title=type==="pasaporte"?"Ingresa entre 5 y 20 caracteres":type==="ruc"?"Ingresa los 13 dígitos de tu RUC":"Ingresa los 10 dígitos de tu cédula";
+    number.placeholder=type==="pasaporte"?"Ej. A1234567":type==="ruc"?"Ej. 1790012345001":"Ej. 1712345678";
+  });
+  $("next").addEventListener("click",()=>{if (!sending && validateStep(currentStep))showStep(currentStep+1);});
+  $("previous").addEventListener("click",()=>{if (!sending)showStep(currentStep-1);});
+  photoInput.addEventListener("change",()=>{
+    if (photoPreviewUrl) URL.revokeObjectURL(photoPreviewUrl);
+    photoPreviewUrl=null;photoPreview.classList.add("hidden");
+    if (photoInput.files?.[0]) {
+      photoPreviewUrl=URL.createObjectURL(photoInput.files[0]);
+      photoPreview.src=photoPreviewUrl;photoPreview.classList.remove("hidden");
+    }
+  });
+  async function photoPayload(file){
  if(!file)return null;
  if(!file.type.startsWith("image/"))throw Error("Selecciona una imagen de tu compra");
  if(file.size>25000000)throw Error("La fotografía original es demasiado pesada. Elige una imagen menor a 25 MB");
@@ -64,12 +223,46 @@ async function photoPayload(file){
  });
  return {receipt_base64:String(dataUrl).split(",")[1],receipt_mime:"image/jpeg"};
 }
-document.getElementById("again").onclick=()=>{f.reset();if(photoPreviewUrl)URL.revokeObjectURL(photoPreviewUrl);photoPreviewUrl=null;photoPreview.classList.add("hidden");f.classList.remove("hidden");document.getElementById("confirmed").classList.add("hidden");};
-f.onsubmit=async(e)=>{e.preventDefault();btn.disabled=true;btn.textContent="Guardando…";err.classList.add("hidden");
-const obj=Object.fromEntries(new FormData(f).entries());delete obj.receipt;obj.privacy_accepted=document.getElementById("privacy_accepted").checked;obj.action="register";
-try{btn.textContent="Preparando la foto…";const photo=await photoPayload(photoInput.files?.[0]);if(photo)Object.assign(obj,photo);btn.textContent="Enviando…";const r=await fetch("https://oppaviqjlyrnkpxjsfvo.supabase.co/functions/v1/invoice-api",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(obj)});
-const j=await r.json();if(!r.ok||!j.ok)throw Error(j.error||"No se pudo guardar");
-f.classList.add("hidden");document.getElementById("confirmed").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"});}
-catch(ex){err.textContent=ex.message||"Comprueba tu conexión";err.classList.remove("hidden");}
-finally{btn.disabled=false;btn.textContent="Guardar mis datos";}};
-</script></body></html>
+  $("again").addEventListener("click",()=>{
+    f.reset();
+    $("phone").setCustomValidity("");
+    if (photoPreviewUrl) URL.revokeObjectURL(photoPreviewUrl);
+    photoPreviewUrl=null;photoPreview.classList.add("hidden");
+    $("confirmed").classList.add("hidden");$("wizard").classList.remove("hidden");
+    $("id_type").dispatchEvent(new Event("change"));
+    showStep(0);
+  });
+  f.addEventListener("submit", async (event)=>{
+    event.preventDefault();
+    if (sending) return;
+    for (let i=0;i<3;i++) {
+      showStep(i,false);
+      if (!validateStep(i)) return;
+    }
+    showStep(2,false);
+    const obj=Object.fromEntries(new FormData(f).entries());
+    delete obj.receipt;
+    obj.privacy_accepted=$("privacy_accepted").checked;
+    obj.action="register";
+    sending=true;btn.disabled=true;$("next").disabled=true;$("previous").disabled=true;
+    btn.textContent="Preparando datos…";
+    try {
+      const photo=await photoPayload(photoInput.files?.[0]);
+      if (photo) Object.assign(obj,photo);
+      btn.textContent="Guardando información…";
+      const response=await fetch(API,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(obj)});
+      const result=await response.json();
+      if (!response.ok || !result.ok) throw new Error(result.error||"No se pudieron guardar los datos");
+      $("wizard").classList.add("hidden");$("confirmed").classList.remove("hidden");
+      window.scrollTo({top:0,behavior:"smooth"});
+    } catch(error) {
+      err.textContent=error.message||"No se pudo conectar. Intenta nuevamente.";
+      err.classList.remove("hidden");
+    } finally {
+      sending=false;btn.disabled=false;$("next").disabled=false;$("previous").disabled=false;
+      btn.textContent="Guardar mis datos";
+    }
+  });
+  </script>
+</body>
+</html>
