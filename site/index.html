@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>Datos para tu factura | Nicole Encajes</title>
-  <link rel="stylesheet" href="./styles.css?v=5">
+  <link rel="stylesheet" href="./styles.css?v=6">
 </head>
-<body>
+<body class="invoice-registration">
   <header class="brand-header">
     <div class="head"><img src="./logo-nicole.webp" class="brand-logo" width="72" height="72" alt="Nicole Encajes"></div>
   </header>
@@ -88,6 +88,7 @@
           <fieldset class="wizard-page hidden" data-step="2">
             <legend class="wizard-title" tabindex="-1">Adjunta tu comprobante</legend>
             <p class="wizard-help">Si tienes una foto de tu compra, súbela para identificar los artículos y cantidades.</p>
+            <div class="step3-columns">
             <div class="upload-box">
               <label for="receipt" class="upload-label">Foto del comprobante <span class="optional">(opcional)</span></label>
               <input type="file" id="receipt" name="receipt" accept="image/*" aria-describedby="photohelp">
@@ -102,6 +103,7 @@
                 <div><dt>Correo</dt><dd id="summaryEmail"></dd></div>
                 <div><dt>Celular</dt><dd id="summaryPhone"></dd></div>
               </dl>
+            </div>
             </div>
             <label class="check privacy-check" for="privacy_accepted">
               <input type="checkbox" id="privacy_accepted" name="privacy_accepted" required>
