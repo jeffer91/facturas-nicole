@@ -3,29 +3,53 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+
 concurrency:
-  group: github-pages
-  cancel-in-progress: true
+  group: facturas-nicole-pages
+  cancel-in-progress: false
+
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
+    permissions:
+      contents: read
     steps:
       - name: Descargar repositorio
         uses: actions/checkout@v4
-      - name: Preparar Pages
+
+      - name: Verificar versión de tres pasos
+        run: |
+          test -f site/index.html
+          test -f site/styles.css
+          test -f site/logo-nicole.webp
+          grep -q 'data-step="0"' site/index.html
+          grep -q 'data-step="1"' site/index.html
+          grep -q 'data-step="2"' site/index.html
+          grep -q 'id="next"' site/index.html
+
+      - name: Configurar GitHub Pages
         uses: actions/configure-pages@v5
         with:
           enablement: true
-      - name: Subir web
+
+      - name: Subir archivos para Pages
         uses: actions/upload-pages-artifact@v4
         with:
           path: ./site
-      - name: Publicar
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: \${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Permitir que GitHub indexe el artefacto
+        run: sleep 20
+
+      - name: Publicar sitio en Pages
         id: deployment
         uses: actions/deploy-pages@v4
