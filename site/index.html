@@ -1,25 +1,25 @@
-<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="referrer" content="strict-origin-when-cross-origin"><title>Datos para tu factura | Nicole Encajes</title><link rel="stylesheet" href="./styles.css"></head><body>
-<header><div class="head"><div class="brand">NICOLE <em>ENCAJES</em></div><small>Registro de datos de facturación</small></div></header>
-<main><h1>Registra los datos para tu factura</h1><p class="lead">Escanea, completa el formulario y listo. Nicole Encajes utilizará estos datos para preparar tu factura y enviártela al correo electrónico registrado. No necesitas contraseña.</p>
-<div class="card">
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="referrer" content="strict-origin-when-cross-origin"><title>Datos para tu factura | Nicole Encajes</title><link rel="stylesheet" href="./styles.css?v=3"></head><body>
+<header class="brand-header"><div class="head"><img src="./logo-nicole.webp" class="brand-logo" alt="Nicole Encajes" width="72" height="72"></div></header>
+<main class="compact-main"><div class="card form-card">
+<div class="form-intro"><h1>Datos para tu factura</h1><p class="lead">Completa tus datos para recibir tu factura por correo electrónico. No necesitas contraseña.</p></div>
 <section id="confirmed" class="success hidden" role="status" aria-live="polite"><h2>¡Datos recibidos!</h2><p>Tu información quedó registrada. Nicole Encajes podrá consultarla para gestionar tu factura.</p><button id="again" class="secondary" type="button">Registrar otra persona</button></section>
 <form id="form"><div class="grid">
 <div class="field"><label for="id_type">Tipo de identificación <span class="required">*</span></label><select id="id_type" name="id_type" required><option value="cedula">Cédula</option><option value="ruc">RUC</option><option value="pasaporte">Pasaporte</option></select></div>
 <div class="field"><label for="id_number">Número de identificación <span class="required">*</span></label><input id="id_number" name="id_number" maxlength="20" required placeholder="Tu cédula, RUC o pasaporte"></div>
 <div class="field span2"><label for="full_name">Nombres completos o razón social <span class="required">*</span></label><input id="full_name" name="full_name" maxlength="200" autocomplete="name" required></div>
-<div class="field"><label for="email">Correo electrónico <span class="required">*</span></label><input id="email" name="email" type="email" autocomplete="email" maxlength="200" required placeholder="ejemplo@correo.com"><small>A este correo te podrán enviar la factura.</small></div>
+<div class="field"><label for="email">Correo electrónico <span class="required">*</span></label><input id="email" name="email" type="email" autocomplete="email" maxlength="200" required placeholder="ejemplo@correo.com"></div>
 <div class="field"><label for="phone">Celular / WhatsApp <span class="required">*</span></label><input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="30" required placeholder="0991234567"></div>
 <div class="field span2"><label for="address">Dirección (opcional)</label><input id="address" name="address" maxlength="240" autocomplete="street-address" placeholder="Ciudad, calle y número"></div>
 <div class="field span2"><label for="receipt">Foto del comprobante de compra (opcional)</label>
 <input type="file" id="receipt" name="receipt" accept="image/*" aria-describedby="photohelp" style="padding:10px">
-<small id="photohelp">Toma una fotografía o elígela de tu celular. Deben verse los artículos, cantidades y valores. La imagen se comprime antes de enviarla.</small>
+<small id="photohelp">Toma o adjunta una foto legible de los productos y valores. Máximo 2 MB después de comprimir.</small>
 <img id="photoPreview" class="hidden" alt="Vista previa de la foto del comprobante" style="margin-top:10px;max-width:100%;max-height:300px;object-fit:contain;border:1px solid #dfd2dd;border-radius:8px">
 </div>
 </div>
 <div class="honeypot" aria-hidden="true"><label for="website">Dejar vacío</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
 <label class="check"><input id="privacy_accepted" name="privacy_accepted" type="checkbox" required><span>Acepto que Nicole Encajes utilice mis datos y, si adjunto una foto, la imagen de mi comprobante de compra exclusivamente para gestionar mi facturación, contactarme por ese motivo y remitirme el comprobante. <span class="required">*</span></span></label>
-<p id="error" class="error hidden" role="alert"></p><button type="submit" id="submit" style="width:100%">Guardar mis datos</button><p class="muted" style="text-align:center">* Campos obligatorios</p></form></div>
-<div class="notice"><strong>Privacidad:</strong> los datos son consultados solo por administración y no se muestran públicamente. Para corregirlos o consultar su tratamiento, comunícate directamente con Nicole Encajes. Este formulario no emite facturas automáticamente.</div></main><footer>Nicole Encajes · Ecuador</footer>
+<p id="error" class="error hidden" role="alert"></p><button type="submit" id="submit" style="width:100%">Guardar mis datos</button></form></div>
+<div class="notice"><strong>Privacidad:</strong> tus datos y tu fotografía, si la adjuntas, son privados y solo se utilizan para gestionar tu factura. Para solicitar una corrección, contacta a Nicole Encajes. Este formulario no emite facturas automáticamente.</div></main><footer>Nicole Encajes · Ecuador</footer>
 <script>
 const f=document.getElementById("form"),err=document.getElementById("error"),btn=document.getElementById("submit");
 
