@@ -16,15 +16,33 @@ td(tr,r.full_name,r.address||"Sin dirección");
 td(tr,r.id_number,r.id_type==="cedula"?"Cédula":r.id_type==="ruc"?"RUC":"Pasaporte");
 const contact=td(tr,r.email,r.phone);const a=document.createElement("a");a.href="mailto:"+r.email;a.textContent="Preparar correo";a.style.display="block";contact.append(a);
 const state=document.createElement("td"),pill=document.createElement("span");pill.className="pill"+(r.status==="gestionado"?" done":"");pill.textContent=r.status==="gestionado"?"Gestionado":"Pendiente";state.append(pill);if(r.invoice_reference){const s=document.createElement("small");s.textContent="Factura: "+r.invoice_reference;state.append(s);}tr.append(state);
-const controls=document.createElement("td"),button=document.createElement("button");button.className="small"+(r.status==="gestionado"?" secondary":"");button.textContent=r.status==="gestionado"?"Reabrir":"Marcar gestionado";
+const controls=document.createElement("td");
+if(r.has_receipt){
+ const showPhoto=document.createElement("button");showPhoto.className="small secondary";
+ showPhoto.textContent="Ver foto de la compra";showPhoto.style.marginBottom="6px";
+ showPhoto.onclick=async()=>{
+   showPhoto.disabled=true;
+   try{
+     const response=await call("adminReceipt",{id:r.id});
+     $("receiptImage").src=response.url;
+     $("receiptLink").href=response.url;
+     $("receiptDialog").showModal();
+   }catch(ex){err("panelError",ex.message);}
+   finally{showPhoto.disabled=false;}
+ };
+ controls.append(showPhoto,document.createElement("br"));
+}
+const button=document.createElement("button");button.className="small"+(r.status==="gestionado"?" secondary":"");button.textContent=r.status==="gestionado"?"Reabrir":"Marcar gestionado";
 button.onclick=async()=>{const done=r.status!=="gestionado";let ref="";if(done){const entered=prompt("Referencia de factura (opcional). Marca gestionado después de emitirla:",r.invoice_reference||"");if(entered===null)return;ref=entered;}else if(!confirm("¿Devolver a pendiente?"))return;button.disabled=true;try{await call("adminMark",{id:r.id,completed:done,invoice_reference:ref});await load();}catch(ex){err("panelError",ex.message);}finally{button.disabled=false;}};controls.append(button);
 const copy=document.createElement("button");copy.className="small secondary";copy.style.marginTop="5px";copy.textContent="Copiar datos";copy.onclick=async()=>{const data=[r.full_name,r.id_type+": "+r.id_number,"Correo: "+r.email,"Celular: "+r.phone,"Dirección: "+(r.address||"No indicada")].join("\n");try{await navigator.clipboard.writeText(data);copy.textContent="Copiado";}catch(_){prompt("Copia los datos",data);}};controls.append(document.createElement("br"),copy);tr.append(controls);body.append(tr);
 }}
+$("closeReceipt").onclick=()=>$("receiptDialog").close();
+$("receiptDialog").addEventListener("close",()=>{$("receiptImage").removeAttribute("src");$("receiptLink").removeAttribute("href");});
 $("refresh").onclick=load;$("search").oninput=render;$("filter").onchange=()=>{offset=0;load();};$("prev").onclick=()=>{offset=Math.max(0,offset-100);load();};$("next").onclick=()=>{if(offset+100<total){offset+=100;load();}};
 $("logout").onclick=async()=>{try{await call("adminLogout");}catch(_){}exit();};
 $("copyLink").onclick=()=>{navigator.clipboard.writeText("https://jeffer91.github.io/facturas-nicole/").then(()=>{$("copyLink").textContent="Copiado";},()=>prompt("Copia este enlace","https://jeffer91.github.io/facturas-nicole/"));};
 function escapeCsv(v){let s=String(v??"");if(/^[=+\-@]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"';}
 $("csv").onclick=async()=>{$("csv").disabled=true;try{let all=[],i=0,n=1;while(i<n&&i<50000){const res=await call("adminList",{offset:i,limit:200,status:$("filter").value});all.push(...res.rows);i+=res.rows.length;n=res.total;if(!res.rows.length)break;}
-const keys=["created_at","id_type","id_number","full_name","email","phone","address","status","invoice_reference","managed_at"];
+const keys=["created_at","id_type","id_number","full_name","email","phone","address","has_receipt","status","invoice_reference","managed_at"];
 const content="\ufeff"+[keys.join(";"),...all.map(r=>keys.map(k=>escapeCsv(r[k])).join(";"))].join("\r\n"),url=URL.createObjectURL(new Blob([content],{type:"text/csv;charset=utf-8"}));const a=document.createElement("a");a.href=url;a.download="clientes-nicole-"+new Date().toISOString().slice(0,10)+".csv";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(ex){err("panelError",ex.message);}finally{$("csv").disabled=false;}};
 if(auth)show();
