@@ -10,4 +10,11 @@
 <p id="panelError" class="error hidden" role="alert"></p>
 <div class="tablewrap"><table><thead><tr><th>Fecha</th><th>Cliente</th><th>Documento</th><th>Contacto</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="records"></tbody></table></div>
 <div class="toolbar"><span id="pagination" class="muted"></span><div class="actions"><button id="prev" class="secondary">Anterior</button><button id="next" class="secondary">Siguiente</button></div></div>
-<div class="notice">Marca como gestionado únicamente después de emitir o remitir la factura por el sistema que utilices. Esta página no genera comprobantes electrónicos del SRI ni envía correos.</div></section></main><footer>Nicole Encajes · Panel privado</footer><script src="./app.js"></script></body></html>
+<div class="notice">Marca como gestionado únicamente después de emitir o remitir la factura por el sistema que utilices. Esta página no genera comprobantes electrónicos del SRI ni envía correos.</div>
+<dialog id="receiptDialog" style="border:1px solid #e1d2df;border-radius:14px;max-width:min(94vw,980px);padding:24px;box-shadow:0 25px 90px #0004">
+<h2>Fotografía del comprobante de compra</h2>
+<p class="muted">Comprueba los artículos y cantidades antes de elaborar la factura.</p>
+<img id="receiptImage" alt="Fotografía del comprobante enviado por el cliente" style="display:block;margin:14px auto;max-width:100%;max-height:70vh;object-fit:contain">
+<div class="actions"><a id="receiptLink" target="_blank" rel="noopener noreferrer">Abrir fotografía en otra pestaña</a><button id="closeReceipt" class="secondary" type="button">Cerrar</button></div>
+</dialog>
+</section></main><footer>Nicole Encajes · Panel privado</footer><script src="./app.js"></script></body></html>
