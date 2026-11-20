@@ -1,0 +1,28 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="referrer" content="strict-origin-when-cross-origin"><title>Datos para tu factura | Nicole Encajes</title><link rel="stylesheet" href="./styles.css"></head><body>
+<header><div class="head"><div class="brand">NICOLE <em>ENCAJES</em></div><small>Registro de datos de facturación</small></div></header>
+<main><h1>Registra los datos para tu factura</h1><p class="lead">Escanea, completa el formulario y listo. Nicole Encajes utilizará estos datos para preparar tu factura y enviártela al correo electrónico registrado. No necesitas contraseña.</p>
+<div class="card">
+<section id="confirmed" class="success hidden" role="status" aria-live="polite"><h2>¡Datos recibidos!</h2><p>Tu información quedó registrada. Nicole Encajes podrá consultarla para gestionar tu factura.</p><button id="again" class="secondary" type="button">Registrar otra persona</button></section>
+<form id="form"><div class="grid">
+<div class="field"><label for="id_type">Tipo de identificación <span class="required">*</span></label><select id="id_type" name="id_type" required><option value="cedula">Cédula</option><option value="ruc">RUC</option><option value="pasaporte">Pasaporte</option></select></div>
+<div class="field"><label for="id_number">Número de identificación <span class="required">*</span></label><input id="id_number" name="id_number" maxlength="20" required placeholder="Tu cédula, RUC o pasaporte"></div>
+<div class="field span2"><label for="full_name">Nombres completos o razón social <span class="required">*</span></label><input id="full_name" name="full_name" maxlength="200" autocomplete="name" required></div>
+<div class="field"><label for="email">Correo electrónico <span class="required">*</span></label><input id="email" name="email" type="email" autocomplete="email" maxlength="200" required placeholder="ejemplo@correo.com"><small>A este correo te podrán enviar la factura.</small></div>
+<div class="field"><label for="phone">Celular / WhatsApp <span class="required">*</span></label><input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="30" required placeholder="0991234567"></div>
+<div class="field span2"><label for="address">Dirección (opcional)</label><input id="address" name="address" maxlength="240" autocomplete="street-address" placeholder="Ciudad, calle y número"></div>
+</div>
+<div class="honeypot" aria-hidden="true"><label for="website">Dejar vacío</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
+<label class="check"><input id="privacy_accepted" name="privacy_accepted" type="checkbox" required><span>Acepto que Nicole Encajes utilice mis datos exclusivamente para gestionar mi facturación, contactarme por ese motivo y remitirme el comprobante. <span class="required">*</span></span></label>
+<p id="error" class="error hidden" role="alert"></p><button type="submit" id="submit" style="width:100%">Guardar mis datos</button><p class="muted" style="text-align:center">* Campos obligatorios</p></form></div>
+<div class="notice"><strong>Privacidad:</strong> los datos son consultados solo por administración y no se muestran públicamente. Para corregirlos o consultar su tratamiento, comunícate directamente con Nicole Encajes. Este formulario no emite facturas automáticamente.</div></main><footer>Nicole Encajes · Ecuador</footer>
+<script>
+const f=document.getElementById("form"),err=document.getElementById("error"),btn=document.getElementById("submit");
+document.getElementById("again").onclick=()=>{f.reset();f.classList.remove("hidden");document.getElementById("confirmed").classList.add("hidden");};
+f.onsubmit=async(e)=>{e.preventDefault();btn.disabled=true;btn.textContent="Guardando…";err.classList.add("hidden");
+const obj=Object.fromEntries(new FormData(f).entries());obj.privacy_accepted=document.getElementById("privacy_accepted").checked;obj.action="register";
+try{const r=await fetch("https://oppaviqjlyrnkpxjsfvo.supabase.co/functions/v1/invoice-api",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(obj)});
+const j=await r.json();if(!r.ok||!j.ok)throw Error(j.error||"No se pudo guardar");
+f.classList.add("hidden");document.getElementById("confirmed").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"});}
+catch(ex){err.textContent=ex.message||"Comprueba tu conexión";err.classList.remove("hidden");}
+finally{btn.disabled=false;btn.textContent="Guardar mis datos";}};
+</script></body></html>
