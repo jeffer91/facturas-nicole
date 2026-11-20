@@ -32,6 +32,23 @@ async function getSession(req:Request){
  const key=req.headers.get("x-almacen-key")||"";if(!/^[a-f0-9]{64}$/.test(key))return null;const hashed=await sha(key);
  const {data,error}=await db.from("invoice_admin_sessions").select("token_hash").eq("token_hash",hashed).gt("expires_at",new Date().toISOString()).maybeSingle();if(error)throw error;return data?hashed:null;
 }
+
+const PHOTO_BUCKET="nicole-invoice-receipts";
+function decodePhoto(b:Record<string,unknown>) {
+ if(!b.receipt_base64)return null;
+ const base64=b.receipt_base64, mime=b.receipt_mime;
+ if(typeof base64!=="string"||base64.length>2900000||!/^[A-Za-z0-9+/]+={0,2}$/.test(base64))throw Error("Fotografía inválida o demasiado grande (máximo 2 MB)");
+ if(!["image/jpeg","image/png","image/webp"].includes(String(mime)))throw Error("Solo se permiten imágenes JPG, PNG o WebP");
+ let bytes:Uint8Array;
+ try{bytes=Uint8Array.from(atob(base64),c=>c.charCodeAt(0));}catch{throw Error("No se pudo procesar la imagen");}
+ if(bytes.length<128||bytes.length>2097152)throw Error("La fotografía debe pesar menos de 2 MB");
+ const jpeg=mime==="image/jpeg"&&bytes[0]===255&&bytes[1]===216&&bytes[2]===255;
+ const png=mime==="image/png"&&[137,80,78,71,13,10,26,10].every((x,i)=>bytes[i]===x);
+ const webp=mime==="image/webp"&&[82,73,70,70].every((x,i)=>bytes[i]===x)&&[87,69,66,80].every((x,i)=>bytes[i+8]===x);
+ if(!jpeg&&!png&&!webp)throw Error("El archivo no es una imagen válida");
+ return {bytes,mime:String(mime),ext:jpeg?"jpg":png?"png":"webp"};
+}
+
 Deno.serve(async(req:Request)=>{
  const origin=req.headers.get("origin");
  if(req.method==="OPTIONS")return new Response(null,{status:204,headers:h(origin)});
@@ -43,8 +60,16 @@ Deno.serve(async(req:Request)=>{
    if(b.website)return resp({ok:true},200,origin);
    if(await limit(req,"register",10,3600))return resp({ok:false,error:"Demasiadas solicitudes. Intenta más tarde."},429,origin);
    let data;try{data=client(b);}catch(e){return resp({ok:false,error:(e as Error).message},400,origin);}
-   const {error}=await db.from("invoice_client_registrations").insert({...data,privacy_accepted_at:new Date().toISOString()});if(error)throw error;
-   return resp({ok:true,message:"Tus datos fueron guardados"},200,origin);
+   let photo;try{photo=decodePhoto(b);}catch(e){return resp({ok:false,error:(e as Error).message},400,origin);}
+   const id=crypto.randomUUID();
+   const path=photo?id+"/comprobante-"+crypto.randomUUID()+"."+photo.ext:null;
+   let uploaded=false;
+   try{
+     if(photo&&path){const s=await db.storage.from(PHOTO_BUCKET).upload(path,photo.bytes,{contentType:photo.mime,cacheControl:"0",upsert:false});if(s.error)throw s.error;uploaded=true;}
+     const {error}=await db.from("invoice_client_registrations").insert({id,...data,privacy_accepted_at:new Date().toISOString(),receipt_storage_path:path,receipt_mime:photo?.mime||null,receipt_uploaded_at:photo?new Date().toISOString():null});
+     if(error)throw error;
+   }catch(e){if(uploaded&&path)await db.storage.from(PHOTO_BUCKET).remove([path]);throw e;}
+   return resp({ok:true,message:"Tus datos y tu comprobante se guardaron correctamente"},200,origin);
   }
   if(action==="adminLogin"){
    if(await limit(req,"adminLogin",12,3600))return resp({ok:false,error:"Demasiados intentos. Intenta más tarde."},429,origin);
@@ -57,10 +82,20 @@ Deno.serve(async(req:Request)=>{
   const session=await getSession(req);if(!session)return resp({ok:false,error:"Sesión no autorizada o vencida"},401,origin);
   if(action==="adminList"){
    const offset=Math.max(0,Math.min(50000,Math.floor(+b.offset||0))),size=Math.max(1,Math.min(200,Math.floor(+b.limit||100)));
-   let q=db.from("invoice_client_registrations").select("id,id_type,id_number,full_name,email,phone,address,status,invoice_reference,created_at,managed_at",{count:"exact"});
+   let q=db.from("invoice_client_registrations").select("id,id_type,id_number,full_name,email,phone,address,status,invoice_reference,created_at,managed_at,receipt_storage_path",{count:"exact"});
    if(b.status==="pendiente"||b.status==="gestionado")q=q.eq("status",b.status);
    const {data,count,error}=await q.order("created_at",{ascending:false}).order("id",{ascending:false}).range(offset,offset+size-1);if(error)throw error;
-   return resp({ok:true,rows:data||[],total:count||0,offset,limit:size},200,origin);
+   const rows=(data||[]).map(({receipt_storage_path,...r})=>({...r,has_receipt:!!receipt_storage_path}));
+   return resp({ok:true,rows,total:count||0,offset,limit:size},200,origin);
+  }
+  if(action==="adminReceipt"){
+   const id=txt(b.id,40);if(!/^[a-f0-9-]{36}$/i.test(id))return resp({ok:false,error:"Identificador inválido"},400,origin);
+   const {data,error}=await db.from("invoice_client_registrations").select("receipt_storage_path").eq("id",id).maybeSingle();
+   if(error)throw error;
+   if(!data?.receipt_storage_path)return resp({ok:false,error:"Este cliente no adjuntó una fotografía"},404,origin);
+   const s=await db.storage.from(PHOTO_BUCKET).createSignedUrl(data.receipt_storage_path,120);
+   if(s.error)throw s.error;
+   return resp({ok:true,url:s.data.signedUrl,expires_in:120},200,origin);
   }
   if(action==="adminMark"){
    const id=txt(b.id,40);if(!/^[a-f0-9-]{36}$/i.test(id))return resp({ok:false,error:"Identificador inválido"},400,origin);
