@@ -223,3 +223,22 @@ dialog { border-color: var(--border) !important; }
 @media (prefers-reduced-motion: reduce) {
   .wizard-main * { scroll-behavior:auto; }
 }
+
+
+/* Cabecera reducida, sin texto de marca duplicado; controles del formulario grandes. */
+.brand-header { padding: 2px 12px; border-bottom-width: 1px; }
+.brand-header .head { min-height: 42px; height: 42px; }
+.brand-logo { width: 42px; height: 42px; object-fit: contain; }
+.wizard-main { margin-top: 12px; }
+.wizard-card { padding-top: 22px; }
+.wizard-main .form-intro { margin-bottom: 18px; }
+.wizard-main h1 { font-size: clamp(27px, 3.4vw, 32px); margin-bottom: 6px; }
+.wizard-main .lead { font-size: 16px; }
+.stepper { margin-bottom: 22px; }
+@media (max-width: 700px) {
+  .brand-header { padding: 1px 8px; }
+  .brand-header .head { min-height: 40px; height: 40px; }
+  .brand-logo { width: 40px; height: 40px; }
+  .wizard-card { padding-top: 16px; }
+  .wizard-main h1 { font-size: 27px; }
+}

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>Datos para tu factura | Nicole Encajes</title>
-  <link rel="stylesheet" href="./styles.css?v=4">
+  <link rel="stylesheet" href="./styles.css?v=5">
 </head>
 <body>
   <header class="brand-header">
@@ -14,8 +14,7 @@
   <main class="wizard-main">
     <div class="card wizard-card">
       <div class="form-intro">
-        <p class="eyebrow">NICOLE ENCAJES</p>
-        <h1>Datos para tu factura</h1>
+        <h1>Datos para facturación</h1>
         <p class="lead">Regístrate en tres pasos para recibir tu factura por correo. Sin contraseña.</p>
       </div>
 
@@ -251,8 +250,10 @@
       if (photo) Object.assign(obj,photo);
       btn.textContent="Guardando información…";
       const response=await fetch(API,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(obj)});
-      const result=await response.json();
-      if (!response.ok || !result.ok) throw new Error(result.error||"No se pudieron guardar los datos");
+      let result;
+      try { result = await response.json(); }
+      catch { throw new Error("No pudimos recibir la respuesta del servidor. Comprueba tu conexión y vuelve a intentar."); }
+      if (!response.ok || !result.ok) throw new Error(result.error||"No se pudieron guardar los datos. Intenta nuevamente.");
       $("wizard").classList.add("hidden");$("confirmed").classList.remove("hidden");
       window.scrollTo({top:0,behavior:"smooth"});
     } catch(error) {
