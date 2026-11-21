@@ -1,0 +1,20 @@
+name: Pruebas del motor local de facturación
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'facturador_local/**'
+      - '.github/workflows/test-facturador-local.yml'
+  workflow_dispatch:
+
+jobs:
+  test-xml:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Ejecutar pruebas unitarias
+        run: python -m unittest discover -s facturador_local/tests -v
