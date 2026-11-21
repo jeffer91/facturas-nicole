@@ -30,7 +30,12 @@ class DiskStore {
     fs.writeFileSync(temp,JSON.stringify(obj,null,2),{mode:0o600,flag:"wx"});
     fs.renameSync(temp,p);
   }
-  config(){return this.read(this.configPath,{ambiente:"pruebas",nextSeq:1,estab:"001",ptoEmi:"001",obligadoContabilidad:false,tipoPago:"01",smtpPort:587,smtpSecure:false,autoSend:false});}
+  config(){
+    const cfg=this.read(this.configPath,{ambiente:"pruebas",nextSeq:1,estab:"001",ptoEmi:"001",obligadoContabilidad:false,tipoPago:"01",smtpPort:587,smtpSecure:false,autoSend:false});
+    const max=this.ledger().records.filter(r=>r.ruc===cfg.ruc&&r.estab===cfg.estab&&r.ptoEmi===cfg.ptoEmi).reduce((m,r)=>Math.max(m,r.seq),0);
+    cfg.nextSeq=Math.max(Number(cfg.nextSeq)||1,max+1);
+    return cfg;
+  }
   ledger(){return this.read(this.ledgerPath,{records:[]});}
   list(){return this.ledger().records.slice().reverse().map(r=>({...r,items:undefined}));}
   get(id){return this.ledger().records.find(r=>r.id===id);}
@@ -279,6 +284,7 @@ function createSriService(userDataPath){
   }
   async function email(id){ensureIdle();try{return await emailInternal(id);}finally{release();}}
   async function selectCertificate(dialog){
+    if(busy)throw Error("Espera a que termine la operación en curso.");
     const x=await dialog.showOpenDialog({title:"Elegir certificado de firma electrónica",properties:["openFile"],filters:[{name:"Firma electrónica P12/PFX",extensions:["p12","pfx"]}]});
     if(x.canceled||!x.filePaths[0])return {canceled:true};
     const cfg=store.config();store.saveConfig({...cfg,p12Path:x.filePaths[0]});
@@ -286,7 +292,7 @@ function createSriService(userDataPath){
   }
   return {
     settings:()=>{const c=store.config();return {...c,hasSmtpPassword:store.hasSmtpPassword()};},
-    saveSettings:({smtpPassword,...config})=>{const c=store.saveConfig(config);if(smtpPassword)store.saveSmtpPassword(smtpPassword);return {...c,hasSmtpPassword:store.hasSmtpPassword()};},
+    saveSettings:({smtpPassword,...config})=>{if(busy)throw Error("No cambies la configuración durante una emisión.");const c=store.saveConfig(config);if(smtpPassword)store.saveSmtpPassword(smtpPassword);return {...c,hasSmtpPassword:store.hasSmtpPassword()};},
     selectCertificate,
     list:()=>store.list(),
     issue,
@@ -296,4 +302,4 @@ function createSriService(userDataPath){
     file: (id,kind)=>{const rec=store.get(id);if(!rec)throw Error("Factura no encontrada.");if(!["firmado.xml","autorizado.xml","factura.pdf"].includes(kind))throw Error("Archivo inválido.");const p=store.file(id,kind);if(!fs.existsSync(p))throw Error("El archivo todavía no existe.");return p;}
   };
 }
-module.exports={createSriService,DiskStore,buildLines,validateOrder};
+module.exports={createSriService,DiskStore,buildLines,validateOrder,normalizeStatus};
