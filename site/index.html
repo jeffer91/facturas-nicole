@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>Datos para tu factura | Nicole Encajes</title>
-  <link rel="stylesheet" href="./styles.css?v=6">
+  <link rel="stylesheet" href="./styles.css?v=7">
 </head>
 <body class="invoice-registration">
   <header class="brand-header">
@@ -59,9 +59,17 @@
                 <label for="id_number">Número de identificación <span class="required">*</span></label>
                 <input name="id_number" id="id_number" type="text" inputmode="numeric" maxlength="13" required autocomplete="off" placeholder="Ej. 1712345678" pattern="[0-9]{10}" title="Ingresa los 10 dígitos de tu cédula">
               </div>
-              <div class="field span2">
-                <label for="full_name">Nombres completos o razón social <span class="required">*</span></label>
-                <input name="full_name" id="full_name" type="text" maxlength="200" minlength="3" autocomplete="name" required placeholder="Como deben aparecer en la factura">
+              <div class="field natural-person-field">
+                <label for="first_names">Nombres <span class="required">*</span></label>
+                <input name="first_names" id="first_names" type="text" maxlength="100" minlength="2" autocomplete="given-name" required placeholder="Ej. Jefferson">
+              </div>
+              <div class="field natural-person-field">
+                <label for="last_names">Apellidos <span class="required">*</span></label>
+                <input name="last_names" id="last_names" type="text" maxlength="100" minlength="2" autocomplete="family-name" required placeholder="Ej. Villarreal Enríquez">
+              </div>
+              <div class="field span2 hidden" id="company-field">
+                <label for="company_name">Razón social <span class="required">*</span></label>
+                <input name="company_name" id="company_name" type="text" maxlength="200" minlength="3" autocomplete="organization" disabled placeholder="Como figura en el RUC">
               </div>
             </div>
           </fieldset>
@@ -153,8 +161,12 @@
       window.scrollTo({top:0,behavior:"smooth"});
     }
   }
+  function nombreParaFactura() {
+    if ($("id_type").value === "ruc") return $("company_name").value.trim();
+    return [$("first_names").value.trim(), $("last_names").value.trim()].filter(Boolean).join(" ");
+  }
   function updateSummary() {
-    $("summaryName").textContent = $("full_name").value.trim() || "—";
+    $("summaryName").textContent = nombreParaFactura() || "—";
     $("summaryId").textContent = $("id_type").selectedOptions[0].text + ": " + $("id_number").value.trim();
     $("summaryEmail").textContent = $("email").value.trim() || "—";
     $("summaryPhone").textContent = $("phone").value.trim() || "—";
@@ -182,6 +194,15 @@
     number.pattern=type==="pasaporte"?"[A-Za-z0-9]{5,20}":type==="ruc"?"[0-9]{13}":"[0-9]{10}";
     number.title=type==="pasaporte"?"Ingresa entre 5 y 20 caracteres":type==="ruc"?"Ingresa los 13 dígitos de tu RUC":"Ingresa los 10 dígitos de tu cédula";
     number.placeholder=type==="pasaporte"?"Ej. A1234567":type==="ruc"?"Ej. 1790012345001":"Ej. 1712345678";
+    const esRuc=type==="ruc";
+    document.querySelectorAll(".natural-person-field").forEach(campo=>{
+      campo.classList.toggle("hidden",esRuc);
+      campo.querySelector("input").required=!esRuc;
+      campo.querySelector("input").disabled=esRuc;
+    });
+    $("company-field").classList.toggle("hidden",!esRuc);
+    $("company_name").required=esRuc;
+    $("company_name").disabled=!esRuc;
   });
   $("next").addEventListener("click",()=>{if (!sending && validateStep(currentStep))showStep(currentStep+1);});
   $("previous").addEventListener("click",()=>{if (!sending)showStep(currentStep-1);});
@@ -242,6 +263,12 @@
     }
     showStep(2,false);
     const obj=Object.fromEntries(new FormData(f).entries());
+    // Compatibilidad con el servidor actual: almacena nombre completo en full_name.
+    // Los clientes introducen nombres y apellidos por separado.
+    obj.full_name=nombreParaFactura();
+    delete obj.first_names;
+    delete obj.last_names;
+    delete obj.company_name;
     delete obj.receipt;
     obj.privacy_accepted=$("privacy_accepted").checked;
     obj.action="register";
