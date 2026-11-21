@@ -42,6 +42,8 @@ class DiskStore {
   saveConfig(next){
     const current=this.config(), all=this.ledger().records;
     const cfg={...current,...next};
+    if(cfg.contribuyenteRimpe&&!["CONTRIBUYENTE RÉGIMEN RIMPE"].includes(cfg.contribuyenteRimpe))
+      throw Error("La condición RIMPE seleccionada no es compatible con el XSD implementado.");
     if(!validEnv.has(cfg.ambiente))throw Error("Ambiente inválido.");
     if(!/^\d{3}$/.test(str(cfg.estab))||!/^\d{3}$/.test(str(cfg.ptoEmi)))throw Error("Establecimiento y punto: exactamente 3 dígitos.");
     if(cfg.ruc)identifier(cfg.ruc);
@@ -132,7 +134,11 @@ async function makeRide(file,record,cfg) {
       .text("Ambiente: "+record.ambiente.toUpperCase()).text("Estado SRI: "+record.estado)
       .text("Autorización: "+(record.numeroAutorizacion||"Pendiente"))
       .text("Fecha: "+new Date(record.createdAt).toLocaleString("es-EC",{timeZone:"America/Guayaquil"}))
-      .text("Dirección matriz: "+cfg.direccionMatriz);
+      .text("Dirección matriz: "+cfg.direccionMatriz)
+      .text("Dirección establecimiento: "+(cfg.direccionEstablecimiento||cfg.direccionMatriz))
+      .text("Obligado a llevar contabilidad: "+(cfg.obligadoContabilidad?"SÍ":"NO"));
+    if(cfg.contribuyenteEspecial)pdf.text("Contribuyente especial: "+cfg.contribuyenteEspecial);
+    if(cfg.contribuyenteRimpe)pdf.text(cfg.contribuyenteRimpe);
     pdf.moveDown().font("Helvetica-Bold").text("CLIENTE").font("Helvetica").text(record.cliente.razonSocial)
       .text("Identificación: "+record.cliente.identificacion).text("Correo: "+(record.cliente.email||"No indicado"));
     pdf.moveDown().font("Helvetica-Bold").text("DETALLE DE PRODUCTOS").moveDown(0.3);
@@ -240,12 +246,17 @@ function createSriService(userDataPath){
       const numero=cfg.estab+"-"+cfg.ptoEmi+"-"+digits(seq,9);
       const emisor={ruc:identifier(cfg.ruc),razonSocial:str(cfg.razonSocial),nombreComercial:str(cfg.nombreComercial)||undefined,
         establecimiento:cfg.estab,puntoEmision:cfg.ptoEmi,direccionMatriz:str(cfg.direccionMatriz),
+        direccionEstablecimiento:str(cfg.direccionEstablecimiento)||undefined,
+        contribuyenteEspecial:str(cfg.contribuyenteEspecial)||undefined,
+        contribuyenteRimpe:str(cfg.contribuyenteRimpe)||undefined,
         obligadoContabilidad:!!cfg.obligadoContabilidad};
       const draft=lib.xml.buildFacturaXml({
         ambiente:cfg.ambiente==="pruebas"?lib.core.Ambiente.Pruebas:lib.core.Ambiente.Produccion,
         fechaEmision:new Date(),secuencial:digits(seq,9),emisor,
-        comprador:{tipoIdentificacion:allowedIdTypes[str(c.tipo).toLowerCase()],identificacion:str(c.identificacion),razonSocial:str(c.razonSocial)},
-        detalles:totals.lines,pagos:[{formaPago:str(cfg.tipoPago||"01"),total:money(totals.total)}]
+        comprador:{tipoIdentificacion:allowedIdTypes[str(c.tipo).toLowerCase()],identificacion:str(c.identificacion),razonSocial:str(c.razonSocial),
+          direccion:str(c.direccion)||undefined},
+        detalles:totals.lines,pagos:[{formaPago:str(cfg.tipoPago||"01"),total:money(totals.total)}],
+        infoAdicional:c.email?{"Correo del cliente":str(c.email)}:undefined
       });
       const signed=lib.signature.signXml(draft.xml,creds);
       if(!/^\d{49}$/.test(draft.claveAcceso))throw Error("El XML no generó una clave de acceso correcta.");
