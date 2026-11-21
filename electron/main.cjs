@@ -17,7 +17,7 @@ function createWindow(){
     }
   });
   mainWindow.once("ready-to-show",()=>mainWindow.show());
-  mainWindow.loadFile(path.join(APP_ROOT,"site","facturador","index.html"));
+  mainWindow.loadURL("https://jeffer91.github.io/facturas-nicole/facturador/");
   mainWindow.webContents.setWindowOpenHandler(({url})=>{
     if(isAllowedExternal(url))shell.openExternal(url);
     return {action:"deny"};
