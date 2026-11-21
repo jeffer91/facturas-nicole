@@ -4,7 +4,7 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const os=require("node:os");
 const path=require("node:path");
-const {buildLines,DiskStore,validateOrder}=require("../electron/sri-service.cjs");
+const {buildLines,DiskStore,validateOrder,normalizeStatus}=require("../electron/sri-service.cjs");
 
 test("Calcula subtotal, IVA y total de la factura por línea",()=>{
   const result=buildLines({items:[
@@ -47,4 +47,11 @@ test("El historial resiste reinicios y no permite repetir secuenciales",()=>{
     assert.throws(()=>next.reserve({...r,id:"00000000-0000-4000-8000-000000000002",claveAcceso:"otraClave"}));
     assert.throws(()=>next.saveConfig({...next.config(),nextSeq:2000}));
   }finally{fs.rmSync(dir,{recursive:true,force:true});}
+});
+
+test("Interpreta respuestas de autorización reales del SDK",()=>{
+  assert.equal(normalizeStatus({autorizaciones:[{estado:"AUTORIZADO"}]}),"AUTORIZADO");
+  assert.equal(normalizeStatus({autorizaciones:[{estado:"NO AUTORIZADO"}]}),"NO_AUTORIZADO");
+  assert.equal(normalizeStatus({autorizaciones:[]}),"PENDIENTE");
+  assert.equal(normalizeStatus({estado:"DEVUELTA"}),"DEVUELTA");
 });
