@@ -53,7 +53,9 @@ class DiskStore {
   }
   reserve(rec){
     const ledger=this.ledger();
-    if(ledger.records.some(r=>r.id===rec.id||r.claveAcceso===rec.claveAcceso))throw Error("Factura duplicada.");
+    if(ledger.records.some(r=>r.id===rec.id||r.claveAcceso===rec.claveAcceso||
+      (r.ruc===rec.ruc&&r.estab===rec.estab&&r.ptoEmi===rec.ptoEmi&&r.seq===rec.seq)))
+      throw Error("Factura o secuencial duplicado.");
     ledger.records.push(rec);
     this.write(this.ledgerPath,ledger);
     const c=this.config();
