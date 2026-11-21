@@ -1,0 +1,32 @@
+name: Validar facturador Electron
+on:
+  push:
+    paths:
+      - 'electron/**'
+      - 'site/facturador/**'
+      - 'tests/**'
+      - 'package.json'
+      - '.github/workflows/validar-facturador.yml'
+  pull_request:
+    paths:
+      - 'electron/**'
+      - 'site/facturador/**'
+      - 'tests/**'
+      - 'package.json'
+  workflow_dispatch:
+jobs:
+  validacion:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Instalar dependencias
+        run: npm install --no-audit --no-fund
+      - name: Validar sintaxis
+        run: npm run check
+      - name: Pruebas unitarias sin certificado ni SRI
+        run: npm test
