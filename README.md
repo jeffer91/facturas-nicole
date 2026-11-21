@@ -1,5 +1,12 @@
 # Facturas Nicole — aplicación de escritorio y registro de clientes
 
+> **EMPIEZA AQUÍ — [GUÍA MAESTRA DE PUESTA EN MARCHA](./GUIA_PUESTA_EN_MARCHA.md)**  
+> Este documento lleva el seguimiento de **todo lo que estamos haciendo**, con estados, pruebas y evidencias para llegar a facturar legalmente desde el escritorio. Se actualizará después de cada avance.
+>
+> **Estado actual: NO LISTA PARA FACTURACIÓN REAL.** El motor de XML, firma, SOAP, PDF y correo está incorporado al código, pero todavía faltan ejecutar las pruebas del programa, validar certificado y XML, obtener una autorización de prueba del SRI, revisar RIDE/correo, comprobar secuenciales y habilitación del RUC.
+>
+> **Primer paso siguiente:** instalar y abrir desde VS Code (`npm install`, `npm run check`, `npm test`, `npm start`) y registrar resultados en la guía. Mantener ambiente **PRUEBAS**.
+
 Sistema de Nicole Encajes en Ecuador: registro público de compradores, panel de administración protegido por PIN y facturador de escritorio Electron con integración con el SRI.
 
 ## Enlaces públicos
