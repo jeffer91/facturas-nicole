@@ -110,7 +110,7 @@ $("saveSettings").addEventListener("click",async()=>{
   $("settingsStatus").textContent="";
   const config={
     ruc:$("cfgRuc").value.trim(),razonSocial:$("cfgRazon").value.trim(),nombreComercial:$("cfgComercial").value.trim(),
-    direccionMatriz:$("cfgDireccion").value.trim(),estab:$("cfgEstab").value.trim(),ptoEmi:$("cfgPto").value.trim(),
+    direccionMatriz:$("cfgDireccion").value.trim(),direccionEstablecimiento:$("cfgDireccionEstab").value.trim(),contribuyenteEspecial:$("cfgContribEspecial").value.trim(),contribuyenteRimpe:$("cfgRimpe").value,estab:$("cfgEstab").value.trim(),ptoEmi:$("cfgPto").value.trim(),
     nextSeq:Number($("cfgSeq").value),ambiente:$("cfgAmbiente").value,tipoPago:$("cfgPago").value,
     obligadoContabilidad:$("cfgContabilidad").value==="true",confirmProduction:$("cfgAllowProduction").checked,
     smtpHost:$("smtpHost").value.trim(),smtpPort:Number($("smtpPort").value),smtpSecure:$("smtpSecure").value==="true",
