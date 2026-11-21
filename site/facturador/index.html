@@ -1,17 +1,72 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><title>Facturador privado | Nicole Encajes</title><link rel="stylesheet" href="../styles.css?v=7"><style>
-.invoice-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px}.invoice-layout .card{margin:0}.invoice-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.invoice-fields .field.wide{grid-column:1/-1}.line-grid{display:grid;grid-template-columns:2fr .65fr .85fr auto;gap:8px;align-items:end}.line-grid input{min-width:0}.invoice-total{font-size:26px;font-weight:800;text-align:right}.invoice-items{display:grid;gap:8px}.invoice-actions{display:flex;gap:8px;flex-wrap:wrap}.status-note{background:#f1f3fb;border-radius:10px;padding:12px;font-size:12px;color:#454963}@media(max-width:780px){.invoice-layout{grid-template-columns:1fr}.invoice-fields{grid-template-columns:1fr}.line-grid{grid-template-columns:1fr 1fr}.line-grid .field:first-child{grid-column:1/-1}} 
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src https://oppaviqjlyrnkpxjsfvo.supabase.co; object-src 'none'; frame-src 'none'; base-uri 'none'">
+<title>Facturador Nicole Encajes | Emisión electrónica</title>
+<link rel="stylesheet" href="../styles.css?v=7">
+<style>
+:root{--ink:#343050;--soft:#f1f1f8}
+*{box-sizing:border-box}.invoice-layout{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:14px}.invoice-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.invoice-fields .field.wide{grid-column:1/-1}.line-grid{display:grid;grid-template-columns:2fr .65fr .85fr .6fr auto;gap:8px;align-items:end}.line-grid input{min-width:0;width:100%}.invoice-total{font-size:26px;font-weight:800;text-align:right}.invoice-items{display:grid;gap:8px}.invoice-actions{display:flex;gap:8px;flex-wrap:wrap}.status-note{background:var(--soft);border-radius:10px;padding:12px;font-size:13px;color:#454963}.warning{background:#fff3df;color:#704c00}.success-note{background:#e7f6ea;color:#24593e}.inline-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.config-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.config-grid .field.full{grid-column:1/-1}.mini-status{display:inline-block;padding:5px 9px;border-radius:50px;background:#ebeaf5;color:#363152;font-size:12px;font-weight:700}.mini-status.ok{background:#e7f6ea;color:#24593e}.mini-status.bad{background:#ffeded;color:#8b2932}.history{overflow:auto}.history table{min-width:720px;width:100%;border-collapse:collapse;font-size:12px}.history th,.history td{padding:10px;border-bottom:1px solid #e2e5f0;text-align:left;vertical-align:middle}.history td .invoice-actions button{font-size:11px;padding:6px}.help{font-size:12px;color:#666}.field input[type=checkbox]{width:auto;margin-right:8px}.danger-action{background:#672f43;color:white}.panel-title{margin:0 0 10px;font-size:20px}details.card>summary{cursor:pointer;font-weight:800;padding:2px 0}.collapsed-note{margin:8px 0 0}button:disabled{opacity:.55;cursor:not-allowed}#operationStatus{white-space:pre-wrap}
+@media(max-width:900px){.invoice-layout{grid-template-columns:1fr}.config-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){.invoice-fields,.config-grid{grid-template-columns:1fr}.line-grid{grid-template-columns:1fr 1fr}.line-grid .field:first-child{grid-column:1/-1}.invoice-layout{grid-template-columns:1fr}}
 </style></head><body>
 <header class="brand-header"><div class="head"><img src="../logo-nicole.webp" class="brand-logo" width="72" height="72" alt="Nicole Encajes"></div></header>
 <main class="wide">
-<section id="login" class="card admin-login"><h1>Facturador Nicole Encajes</h1><p class="lead">Acceso privado para preparar facturas. Los clientes utilizan otro enlace.</p><form id="loginForm"><div class="field"><label for="pin">PIN administrativo</label><input id="pin" type="password" inputmode="numeric" maxlength="8" autocomplete="off" required></div><p id="loginError" class="error hidden" role="alert"></p><button id="loginButton" type="submit" style="width:100%">Ingresar al facturador</button></form></section>
+<section id="login" class="card admin-login"><h1>Facturador Nicole Encajes</h1><p class="lead">Ingreso del administrador. El módulo de emisión solo se habilita en la aplicación de escritorio.</p>
+<form id="loginForm"><div class="field"><label for="pin">PIN administrativo</label><input id="pin" type="password" inputmode="numeric" maxlength="8" autocomplete="off" required></div>
+<p id="loginError" class="error hidden" role="alert"></p><button id="loginButton" type="submit" style="width:100%">Ingresar</button></form></section>
 <section id="workspace" class="hidden">
-<div class="toolbar"><div><h1>Preparar factura</h1><p class="lead">Selecciona un cliente registrado y añade los artículos vendidos.</p></div><div class="invoice-actions"><a class="btn secondary" href="../admin/">Ver registros de clientes</a><button id="logout" class="secondary" type="button">Salir</button></div></div>
-<div class="status-note" style="margin-bottom:14px"><strong>Modo preparación:</strong> este módulo todavía no firma, emite ni envía comprobantes al SRI. Los valores son un borrador interno; no constituyen una factura tributaria.</div>
-<p id="workError" class="error hidden" role="alert"></p>
+<div class="toolbar"><div><h1>Facturas Nicole Encajes</h1><p class="lead">Selecciona el cliente, revisa los productos y emite desde el escritorio.</p></div>
+<div class="invoice-actions"><span id="desktopBadge" class="mini-status">Comprobando modo</span><a class="btn secondary" href="../admin/" target="_blank" rel="noopener">Ver registros de clientes</a><button id="logout" class="secondary" type="button">Salir</button></div></div>
+<p id="browserNotice" class="status-note warning">La página web solo prepara borradores. Para firmar y transmitir al SRI, abre la aplicación Electron de escritorio.</p>
+<div id="environmentNote" class="status-note hidden"></div><p id="workError" class="error hidden" role="alert"></p>
+<details id="configuration" class="card" style="margin:15px 0">
+<summary>Configuración tributaria, firma electrónica y correo</summary>
+<p class="help">La configuración y el archivo de firma permanecen en esta computadora. La contraseña P12/PFX nunca se sube a GitHub ni al servicio de clientes.</p>
+<div class="config-grid">
+<div class="field"><label for="cfgRuc">RUC del emisor</label><input id="cfgRuc" inputmode="numeric" maxlength="13" placeholder="13 dígitos"></div>
+<div class="field"><label for="cfgRazon">Razón social</label><input id="cfgRazon" maxlength="300"></div>
+<div class="field"><label for="cfgComercial">Nombre comercial</label><input id="cfgComercial" maxlength="300"></div>
+<div class="field full"><label for="cfgDireccion">Dirección de la matriz</label><input id="cfgDireccion" maxlength="300"></div>
+<div class="field"><label for="cfgEstab">Establecimiento (3 dígitos)</label><input id="cfgEstab" inputmode="numeric" maxlength="3" value="001"></div>
+<div class="field"><label for="cfgPto">Punto de emisión (3 dígitos)</label><input id="cfgPto" inputmode="numeric" maxlength="3" value="001"></div>
+<div class="field"><label for="cfgSeq">Próximo secuencial (9 dígitos)</label><input id="cfgSeq" type="number" min="1" max="999999999" value="1"></div>
+<div class="field"><label for="cfgAmbiente">Ambiente del SRI</label><select id="cfgAmbiente"><option value="pruebas">PRUEBAS (sin validez tributaria)</option><option value="produccion">PRODUCCIÓN (facturas reales)</option></select></div>
+<div class="field"><label for="cfgPago">Forma de pago SRI</label><select id="cfgPago"><option value="01">01 — Sin uso del sistema financiero</option><option value="19">19 — Tarjeta de crédito</option><option value="20">20 — Otros con sistema financiero</option></select></div>
+<div class="field"><label for="cfgContabilidad">Obligado a llevar contabilidad</label><select id="cfgContabilidad"><option value="false">No</option><option value="true">Sí</option></select></div>
+<div class="field full"><label>Certificado local P12 / PFX</label><div class="inline-actions"><input id="cfgCertPath" style="flex:1;min-width:200px" readonly placeholder="Sin archivo seleccionado"><button id="selectCert" type="button" class="secondary">Seleccionar archivo</button></div></div>
+<div class="field full"><label><input id="cfgAllowProduction" type="checkbox"> He verificado la habilitación del RUC en el SRI y autorizo configurar producción (no habilita emisiones sin confirmación por venta).</label></div>
+</div>
+<h3>Envío automático al correo del cliente (opcional)</h3>
+<p class="help">Configura un servidor SMTP propio para entregar PDF y XML solo cuando la factura está autorizada. La contraseña se guarda cifrada mediante el almacén seguro del sistema operativo.</p>
+<div class="config-grid">
+<div class="field"><label for="smtpHost">Servidor SMTP</label><input id="smtpHost" placeholder="smtp.ejemplo.com"></div>
+<div class="field"><label for="smtpPort">Puerto</label><input id="smtpPort" type="number" min="1" max="65535" value="587"></div>
+<div class="field"><label for="smtpSecure">Cifrado</label><select id="smtpSecure"><option value="false">STARTTLS (587)</option><option value="true">TLS directo (465)</option></select></div>
+<div class="field"><label for="smtpUser">Usuario SMTP</label><input id="smtpUser" autocomplete="username"></div>
+<div class="field"><label for="smtpFrom">Remitente</label><input id="smtpFrom" type="email"></div>
+<div class="field"><label for="smtpPassword">Contraseña de aplicación SMTP</label><input id="smtpPassword" type="password" autocomplete="new-password" placeholder="Dejar en blanco para conservar"></div>
+<div class="field full"><label><input id="autoSend" type="checkbox">Enviar automáticamente al cliente cuando el SRI autorice (solo producción)</label></div>
+</div>
+<div class="inline-actions"><button id="saveSettings" type="button">Guardar configuración</button><span id="settingsStatus" class="help" role="status"></span></div>
+</details>
 <div class="invoice-layout">
-<div class="card"><h2>1. Cliente</h2><div class="invoice-fields"><div class="field wide"><label for="clientSearch">Buscar cliente por nombre o identificación</label><input id="clientSearch" placeholder="Buscar entre los clientes cargados"></div><div class="field wide"><label for="client">Cliente registrado</label><select id="client"><option value="">Selecciona un cliente</option></select></div><div class="field"><label for="identity">Identificación</label><input id="identity" readonly></div><div class="field"><label for="email">Correo</label><input id="email" readonly></div></div>
-<hr style="border:0;border-top:1px solid #e2e5f0;margin:18px 0"><h2>2. Productos</h2><p class="muted">Introduce precios sin impuestos. La tarifa es solo para una estimación y debe verificarse antes de emitir.</p><div id="items" class="invoice-items"></div><button id="addItem" class="secondary" type="button" style="margin-top:12px">+ Añadir producto</button></div>
-<div class="card"><h2>3. Resumen</h2><p class="muted">Borrador no tributario</p><div class="toolbar"><span>Subtotal</span><strong id="subtotal">$0,00</strong></div><div class="toolbar"><span>IVA estimado</span><strong id="tax">$0,00</strong></div><hr style="border:0;border-top:1px solid #e2e5f0"><p class="muted">Total estimado</p><div id="total" class="invoice-total">$0,00</div><div class="field" style="margin-top:14px"><label for="iva">Tarifa IVA para estimación</label><select id="iva"><option value="15">15 %</option><option value="0">0 %</option></select></div><button id="copy" type="button" style="width:100%;margin-top:16px">Copiar resumen del borrador</button><p class="muted" style="margin-top:10px">La emisión electrónica se habilitará únicamente después de integrar y validar firma, impuestos, secuenciales y autorización del SRI.</p></div>
-</div></section></main><footer>Nicole Encajes · Área privada de facturación</footer>
+<div class="card"><h2 class="panel-title">1. Cliente</h2>
+<div class="invoice-fields"><div class="field wide"><label for="clientSearch">Buscar cliente por nombre o identificación</label><input id="clientSearch" placeholder="Buscar clientes registrados"></div><div class="field wide"><label for="client">Cliente</label><select id="client"><option value="">Selecciona un cliente</option></select></div><div class="field"><label for="identity">Identificación</label><input id="identity" readonly></div><div class="field"><label for="email">Correo del cliente</label><input id="email" readonly></div></div>
+<hr style="border:0;border-top:1px solid #e2e5f0;margin:18px 0"><h2 class="panel-title">2. Productos</h2>
+<p class="help">Precios sin impuestos. IVA por producto. Otros impuestos y tratamientos requieren adaptación tributaria.</p><div id="items" class="invoice-items"></div>
+<button id="addItem" class="secondary" type="button" style="margin-top:12px">+ Añadir producto</button></div>
+<div class="card"><h2 class="panel-title">3. Resumen y emisión</h2>
+<div class="toolbar"><span>Subtotal</span><strong id="subtotal">$0,00</strong></div><div class="toolbar"><span>IVA</span><strong id="tax">$0,00</strong></div>
+<hr style="border:0;border-top:1px solid #e2e5f0"><p class="help">Total de la venta</p><div id="total" class="invoice-total">$0,00</div>
+<div class="field" style="margin-top:14px"><label for="certPassword">Contraseña P12/PFX (solo al emitir)</label><input id="certPassword" type="password" autocomplete="off" placeholder="No se almacena"></div>
+<label class="help"><input id="confirmReal" type="checkbox"> Confirmo que esta venta es real y que los datos son correctos (obligatorio en producción).</label>
+<button id="issue" type="button" style="width:100%;margin-top:16px" disabled>Firmar y enviar al SRI</button>
+<button id="copy" type="button" class="secondary" style="width:100%;margin-top:10px">Copiar borrador</button>
+<div id="operationStatus" class="status-note" style="margin-top:14px" role="status">Selecciona un cliente y agrega productos.</div>
+</div></div>
+<div class="card" style="margin-top:16px"><div class="toolbar"><h2 class="panel-title">Historial de comprobantes en esta computadora</h2><button id="refreshHistory" type="button" class="secondary">Actualizar</button></div>
+<p class="help">Los archivos XML firmados y los PDF autorizados se guardan en la carpeta privada de la aplicación. No elimines este historial; realiza respaldos.</p>
+<div id="history" class="history"></div></div>
+</section></main><footer>Nicole Encajes · Emisión electrónica con SRI</footer>
 <script src="./app.js"></script></body></html>
