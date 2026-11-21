@@ -69,7 +69,9 @@ function createWindow(){
   mainWindow.webContents.once("destroyed",()=>authorizedWindows.clear());
   mainWindow.loadFile(html);
   mainWindow.webContents.setWindowOpenHandler(({url})=>{
-    if(isAllowedExternal(url))shell.openExternal(url);
+    if(url.startsWith(pathToFileURL(path.join(root,"site","admin")).href))
+      shell.openExternal("https://jeffer91.github.io/facturas-nicole/admin/");
+    else if(isAllowedExternal(url))shell.openExternal(url);
     return {action:"deny"};
   });
   mainWindow.webContents.on("will-navigate",(e,url)=>{
