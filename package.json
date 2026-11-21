@@ -1,13 +1,14 @@
 {
   "name": "nicole-facturador",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
-  "description": "Nicole Encajes - aplicación de escritorio para preparar facturas",
+  "description": "Nicole Encajes - facturación electrónica SRI en escritorio con firma P12/PFX",
   "main": "electron/main.cjs",
   "scripts": {
     "start": "electron .",
-    "check": "node --check electron/main.cjs && node --check electron/preload.cjs && node --check site/facturador/app.js",
-    "dist": "electron-builder --win nsis"
+    "check": "node --check electron/main.cjs && node --check electron/preload.cjs && node --check electron/sri-service.cjs && node --check site/facturador/app.js",
+    "dist": "npm run check && npm test && electron-builder --win nsis",
+    "test": "node --test tests/*.test.cjs"
   },
   "devDependencies": {
     "electron": "^33.4.11",
@@ -35,5 +36,13 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true
     }
+  },
+  "dependencies": {
+    "@ecuador-tax/core": "0.1.1",
+    "@ecuador-tax/xml": "0.1.1",
+    "@ecuador-tax/signature": "0.1.1",
+    "@ecuador-tax/sri": "0.1.1",
+    "pdfkit": "^0.17.2",
+    "nodemailer": "^7.0.10"
   }
 }
