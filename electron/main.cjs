@@ -12,7 +12,7 @@ const root=path.resolve(__dirname,"..");
 const html=path.resolve(root,"site","facturador","index.html");
 const localURL=pathToFileURL(html).href;
 const apiURL="https://oppaviqjlyrnkpxjsfvo.supabase.co/functions/v1/invoice-api";
-const allowedExternal=new Set(["https://jeffer91.github.io","https://nicoleencajes.com","https://www.nicoleencajes.com","https://www.sri.gob.ec"]);
+const allowedExternal=new Set(["https://jeffer91.github.io","https://nicoleencajes.com","https://www.nicoleencajes.com","https://www.sri.gob.ec","https://github.com"]);
 const allowedAPI=new Set(["adminLogin","adminList","adminLogout"]);
 function isAllowedExternal(url){try{const u=new URL(url);return u.protocol==="https:"&&allowedExternal.has(u.origin);}catch{return false;}}
 function trusted(event){if(!event.senderFrame||event.senderFrame.url!==localURL)throw Error("Origen no autorizado para operación local.");}
