@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.p12
+*.pfx
+*.pem
+*.key
+*.sqlite
+*.sqlite3
+.env
+.env.*
