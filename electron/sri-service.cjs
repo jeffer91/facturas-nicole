@@ -147,7 +147,8 @@ async function makeRide(file,record,cfg) {
 
 function safeMessage(e){return str(e?.message||e).slice(0,500).replace(/(password|contraseña|secret|token)[=: ]+\S+/gi,"$1=[oculto]");}
 function normalizeStatus(response,defaultStatus="PENDIENTE"){
-  const estado=str(response?.estado||response?.autorizacion?.estado||response?.autorizaciones?.autorizacion?.[0]?.estado||defaultStatus).toUpperCase();
+  const raw=str(response?.estado||response?.autorizacion?.estado||response?.autorizaciones?.find?.(x=>x.estado==="AUTORIZADO")?.estado||response?.autorizaciones?.[0]?.estado||defaultStatus).toUpperCase();
+  const estado=raw==="NO AUTORIZADO"?"NO_AUTORIZADO":raw;
   return ["AUTORIZADO","NO_AUTORIZADO","DEVUELTA","PENDIENTE"].includes(estado)?estado:defaultStatus;
 }
 
@@ -169,7 +170,9 @@ function createSriService(userDataPath){
     const s=new sri.SriClient({ambiente:rec.ambiente==="pruebas"?core.Ambiente.Pruebas:core.Ambiente.Produccion});
     const result=await s.autorizacion(rec.claveAcceso);
     let estado=normalizeStatus(result);
-    const auth=result?.autorizacion||result?.autorizaciones?.autorizacion?.[0]||{};
+    const auth=result?.autorizaciones?.find?.(x=>x.estado==="AUTORIZADO")
+      ||result?.autorizaciones?.find?.(x=>x.estado==="NO AUTORIZADO")
+      ||result?.autorizaciones?.[0]||result?.autorizacion||{};
     const patch={estado,ultimoResultado:JSON.stringify(result).slice(0,15000),lastError:""};
     if(estado==="AUTORIZADO"){
       patch.numeroAutorizacion=str(auth.numeroAutorizacion||rec.claveAcceso);
@@ -178,7 +181,12 @@ function createSriService(userDataPath){
       if(xml)fs.writeFileSync(store.file(id,"autorizado.xml"),String(xml),{mode:0o600});
     }
     store.update(id,patch);
-    if(estado==="AUTORIZADO")await makeRide(store.file(id,"factura.pdf"),store.get(id),store.config());
+    if(estado==="AUTORIZADO"){
+      await makeRide(store.file(id,"factura.pdf"),store.get(id),store.config());
+      if(store.get(id).ambiente==="produccion"&&!store.get(id).mailSentAt&&store.config().autoSend&&store.hasSmtpPassword()){
+        try{await emailInternal(id);}catch(e){store.update(id,{mailError:safeMessage(e)});}
+      }
+    }
     return store.get(id);
   }
   async function transmit(id,lib){
