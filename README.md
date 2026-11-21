@@ -1,29 +1,66 @@
-# Facturas Nicole
+# Facturas Nicole — aplicación de escritorio y registro de clientes
 
-Aplicación para recopilar datos de clientes de Nicole Encajes (Ecuador), mediante QR público y panel administrativo.
+Sistema de Nicole Encajes en Ecuador: registro público de compradores, panel de administración protegido por PIN y facturador de escritorio Electron con integración con el SRI.
 
-Enlaces previstos para GitHub Pages:
+## Enlaces públicos
+- Cliente: https://jeffer91.github.io/facturas-nicole/
+- Administrador: https://jeffer91.github.io/facturas-nicole/admin/
+- Cartel QR: https://jeffer91.github.io/facturas-nicole/cartel.html
+- Borrador web: https://jeffer91.github.io/facturas-nicole/facturador/
 
-- Cliente público: https://jeffer91.github.io/facturas-nicole/
-- Administrador con PIN: https://jeffer91.github.io/facturas-nicole/admin/
-- Cartel QR imprimible: https://jeffer91.github.io/facturas-nicole/cartel.html
+La versión web solo permite preparar borradores: **no puede firmar ni enviar comprobantes**. Para emitir debes abrir el programa Electron instalado en una computadora. El registro de clientes sigue usando la Edge Function de Supabase, con sesión administrativa y fotografías de compra privadas.
 
-Campos obligatorios: tipo y número de identificación (cédula, RUC o pasaporte), nombres o razón social, correo, celular y aceptación del tratamiento para facturación. Dirección opcional.
+## Instalar en Windows
+Necesitas Node.js y conexión a Internet para instalar dependencias.
 
-Tecnologías: archivos web estáticos en site; Edge Function invoice-api; tablas privadas del Supabase Nicole Encajes. El PIN está almacenado como hash bcrypt en Supabase, nunca en el código de GitHub. La sesión del administrador dura hasta 8 horas y el formulario de clientes no requiere autenticación. Hay límites básicos para solicitudes y protección RLS; los clientes no pueden listar registros.
+1. Descarga o clona este repositorio en una carpeta local.
+2. Abre una terminal en esa carpeta y ejecuta **npm install**.
+3. Ejecuta **npm run check** y **npm test**.
+4. Inicia el facturador con **npm start**.
+5. Para crear el instalador Windows NSIS utiliza **npm run dist**.
 
-Desde administración se pueden consultar y copiar los datos, exportar CSV y marcar como gestionado después de tramitar la factura. Esta aplicación NO genera XML, firma, autoriza ni envía facturas electrónicas ante el SRI.
+La aplicación de escritorio carga HTML empaquetado localmente. El proceso principal de Electron recibe las operaciones mediante IPC restringido a esa página y a una sesión de administrador validada.
 
-Para activar el sitio: GitHub -> Settings -> Pages -> Build and deployment -> Source: GitHub Actions. Si Pages aún no estaba habilitado, selecciónalo y ejecuta el workflow "Publicar Facturas Nicole".
+## Configurar el emisor
+Abre el panel «Configuración tributaria, firma electrónica y correo» y completa:
 
-Privacidad: información personal de clientes. No usar para marketing sin una base legal separada. Definir un plazo de conservación y procedimiento de rectificación/eliminación.
+- RUC, razón social, nombre comercial y dirección matriz del emisor.
+- Establecimiento, punto de emisión y siguiente secuencial libre según tus registros y el SRI. El valor inicial predeterminado es 1, NO 2000. Un salto de numeración exige verificación previa del punto de emisión y del historial.
+- Obligación de llevar contabilidad y forma de pago.
+- Ambiente PRUEBAS hasta haber realizado una autorización completa con el SRI.
+- Certificado P12/PFX guardado en esta computadora. Su contraseña se solicita para cada factura y nunca se envía al repositorio.
+- Configuración SMTP opcional para enviar el XML y el PDF al comprador después de la autorización. La contraseña SMTP se cifra mediante safeStorage de Electron si está disponible. No se guarda en texto plano.
 
+La pantalla obliga a confirmar el cambio de PRUEBAS a PRODUCCIÓN y cada venta real. En producción confirma previamente la habilitación del RUC como emisor electrónico.
 
-## Fotografías de comprobantes de compra
-- El cliente puede tomar una fotografía o seleccionar una de su galería desde el formulario público. Es **opcional**, no sustituye los datos obligatorios.
-- El navegador convierte la imagen a JPG, la reduce hasta un máximo de 2 MB y evita conservar metadatos EXIF habituales del archivo original.
-- La API valida la cabecera binaria, el tipo y el tamaño, y guarda la fotografía en el bucket privado `nicole-invoice-receipts`.
-- Cada foto queda asociada a un registro en `invoice_client_registrations` mediante `receipt_storage_path`, `receipt_mime` y `receipt_uploaded_at`.
-- La administración puede pulsar **Ver foto de la compra**. Se genera una URL firmada y temporal de 120 segundos para visualizar el archivo.
-- Los visitantes no tienen permisos de consulta sobre la tabla ni acceso directo a los archivos. El CSV indica si hay foto, pero nunca revela la ruta privada.
-- La imagen permite comprobar visualmente los productos o cantidades, **no extrae los productos automáticamente** y **no constituye una factura autorizada por el SRI**.
+## Cómo emitir
+
+1. Inicia sesión con PIN y selecciona un cliente registrado.
+2. Añade productos, cantidades, precios sin impuesto y tarifa de IVA 0 % o 15 % para cada línea.
+3. Introduce la contraseña del certificado P12/PFX.
+4. Pulsa «Firmar y enviar al SRI».
+5. El proceso principal genera el XML, firma XAdES-BES, reserva secuencial y clave de acceso, transmite por SOAP y consulta la autorización.
+6. Si el resultado es AUTORIZADO, genera el PDF y permite remitir XML y PDF por SMTP. Si es PENDIENTE, consulta la misma clave desde el historial y NO generes una factura duplicada.
+7. XML firmado, datos de autorización, PDF e historial se guardan bajo la carpeta local de usuario de Electron, subdirectorio sri-facturas. Debes realizar respaldos periódicos y conservar la documentación tributaria.
+
+Los servicios de producción del SRI son RecepcionComprobantesOffline y AutorizacionComprobantesOffline, alojados en el servidor https://cel.sri.gob.ec/comprobantes-electronicos-ws/ . El ambiente de pruebas utiliza https://celcer.sri.gob.ec/comprobantes-electronicos-ws/ . Nunca se envían los comprobantes por correo electrónico al SRI.
+
+## Estado real y limitaciones
+
+**Implementado en el código:** generación de XML mediante @ecuador-tax/xml 0.1.1, firma mediante @ecuador-tax/signature 0.1.1, SOAP mediante @ecuador-tax/sri 0.1.1, historial persistente, protección de duplicados, PDF/RIDE básico, consulta de estados, envío SMTP opcional y seguridad de IPC.
+
+**Todavía no verificado:** instalación final en el PC del contribuyente, validación con certificado de firma y RUC habilitado, autorización real en ambiente de certificación, comprobaciones del RIDE y pruebas de entrega de correo. El SDK seleccionado declara experimentales sus módulos de XML, firma y SRI, por no contar con evidencia pública de una autorización real de punta a punta. Por tanto, **no se puede afirmar que la app esté lista para emitir legalmente en producción**.
+
+**Alcance tributario:** implementación inicial de facturas ordinarias con IVA 0 % y 15 %. ICE, IRBPNR, exportaciones, reembolsos, regímenes especiales (incluidos campos RIMPE cuando correspondan), notas de crédito, retenciones y otros comprobantes requieren desarrollo y validación antes de utilizarse para dichas operaciones. No uses esta versión para esos casos. La emisión exige revisión tributaria según tu actividad.
+
+## Pruebas y seguridad
+
+- Ejecutar npm run check y npm test. El workflow de GitHub Actions valida sintaxis y pruebas unitarias, no emite facturas reales.
+- Verificar generación y validez XSD del XML firmado usando un P12/PFX real en ambiente de certificación.
+- Verificar recepción RECIBIDA y autorización AUTORIZADO, códigos de rechazo y contingencias.
+- Comprobar numeración, unicidad, reintentos, correo y respaldo de documentos.
+- No subir jamás archivos P12/PFX, contraseñas, XML reales de clientes o historiales a GitHub.
+- Proteger la PC con cifrado de disco y respaldo cifrado: se almacenan datos personales del cliente.
+- En producción el SRI exige transmitir al momento de emitir. La aplicación no debe funcionar como cola de facturas diferidas.
+
+Fuentes oficiales: https://www.sri.gob.ec/facturacion-electronica . Ficha técnica SRI offline v2.34 (julio de 2026). SDK experimental: https://github.com/esteban-dcp/ecuador-tax .
