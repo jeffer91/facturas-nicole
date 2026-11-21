@@ -12,6 +12,25 @@
 </style></head><body>
 <header class="brand-header"><div class="head"><img src="../logo-nicole.webp" class="brand-logo" width="72" height="72" alt="Nicole Encajes"></div></header>
 <main class="wide">
+<section id="setupRoadmap" class="card" style="margin:12px 0 16px;border-left:4px solid #605380" aria-label="Guía de puesta en marcha">
+  <div class="toolbar"><div><h2 style="margin:0 0 5px;font-size:20px">Guía para dejar el facturador listo</h2>
+  <p class="help" style="margin:0">Ruta de desarrollo, comprobaciones y requisitos del SRI; la guía se actualizará con cada avance.</p></div>
+  <span class="mini-status bad">Aún no listo para producción</span></div>
+  <p style="margin:10px 0;font-size:13px"><strong>Programado:</strong> borradores, XML, firma P12/PFX, envío y consulta SOAP, historial, PDF y correo. <strong>Pendiente de comprobar:</strong> instalación, pruebas con certificado real, autorización de prueba del SRI, exactitud del RIDE, envío y habilitación del RUC.</p>
+  <details id="roadmapDetails">
+    <summary style="cursor:pointer;font-weight:700;color:#494069">Ver guía completa y próximos pasos</summary>
+    <ol style="font-size:13px;line-height:1.7;padding-left:22px">
+      <li><strong>Instalar y abrir:</strong> ejecutar <code>npm install</code>, <code>npm run check</code>, <code>npm test</code> y <code>npm start</code> en VS Code. <strong>Pendiente de verificación.</strong></li>
+      <li><strong>Configurar:</strong> RUC, razón social, régimen, establecimiento, punto de emisión y numeración validada (no asumir que 2000 está permitido). Mantener PRUEBAS. <strong>Pendiente.</strong></li>
+      <li><strong>Firmar:</strong> seleccionar en la PC el certificado P12/PFX y verificar que XML, firma y XSD sean válidos. <strong>Pendiente.</strong></li>
+      <li><strong>Validar con SRI:</strong> transmitir factura ficticia al ambiente de certificación y obtener AUTORIZADO. <strong>Pendiente.</strong></li>
+      <li><strong>Comprobar entrega:</strong> RIDE con datos obligatorios, correo, reintentos, respaldo y secuenciales. <strong>Pendiente.</strong></li>
+      <li><strong>Pasar a producción:</strong> solo con RUC habilitado, obligaciones verificadas y pruebas completas. <strong>Bloqueado hasta cumplir lo anterior.</strong></li>
+      <li><strong>Instalar en Windows:</strong> crear instalador con <code>npm run dist</code> y probarlo en el equipo definitivo. <strong>Pendiente.</strong></li>
+    </ol>
+    <p class="help"><a href="https://github.com/jeffer91/facturas-nicole/blob/main/GUIA_PUESTA_EN_MARCHA.md" target="_blank" rel="noopener noreferrer">Abrir guía maestra y registro de avances en GitHub</a></p>
+  </details>
+</section>
 <section id="login" class="card admin-login"><h1>Facturador Nicole Encajes</h1><p class="lead">Ingreso del administrador. El módulo de emisión solo se habilita en la aplicación de escritorio.</p>
 <form id="loginForm"><div class="field"><label for="pin">PIN administrativo</label><input id="pin" type="password" inputmode="numeric" maxlength="8" autocomplete="off" required></div>
 <p id="loginError" class="error hidden" role="alert"></p><button id="loginButton" type="submit" style="width:100%">Ingresar</button></form></section>
