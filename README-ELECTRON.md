@@ -1,6 +1,6 @@
 # Nicole Facturador — aplicación de escritorio (fase de pruebas)
 
-Esta rama `main` incluye una envoltura Electron para abrir localmente la interfaz del facturador.
+Esta rama `main` incluye una envoltura Electron para abrir la interfaz publicada del facturador en una ventana de escritorio.
 
 ## Requisitos
 - Windows 10/11, Node.js LTS y npm.
@@ -26,7 +26,7 @@ El instalador se generará en `dist/` si la compilación concluye correctamente.
 - No incrustar certificados, contraseñas ni claves privadas en Electron o GitHub.
 - Las operaciones de SRI y firma no están integradas; la interfaz solo prepara borradores.
 - La configuración de secuencial 2000 es una intención de negocio, no un número verificado o reservado en el SRI.
-- El facturador local usa `file://` y solicita datos a Supabase: la API debe permitir este origen de forma segura o debe implementarse un backend IPC autenticado. **No se ha verificado que el inicio de sesión funcione desde Electron**.
+- Electron carga `https://jeffer91.github.io/facturas-nicole/facturador/` para conservar el origen web permitido por la API. Requiere internet; **no se ha verificado que el inicio de sesión funcione desde Electron**.
 - No se ha ejecutado `npm install`, `npm start` ni compilación Windows en esta sesión.
 
 ## Pendientes para emisión real
