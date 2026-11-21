@@ -88,7 +88,7 @@ function fillSettings(c){
   settings=c;
   const f=(id,val)=>$(id).value=val??"";
   f("cfgRuc",c.ruc);f("cfgRazon",c.razonSocial);f("cfgComercial",c.nombreComercial);
-  f("cfgDireccion",c.direccionMatriz);f("cfgEstab",c.estab||"001");f("cfgPto",c.ptoEmi||"001");
+  f("cfgDireccion",c.direccionMatriz);f("cfgDireccionEstab",c.direccionEstablecimiento);f("cfgContribEspecial",c.contribuyenteEspecial);f("cfgRimpe",c.contribuyenteRimpe||"");f("cfgEstab",c.estab||"001");f("cfgPto",c.ptoEmi||"001");
   f("cfgSeq",c.nextSeq||1);f("cfgAmbiente",c.ambiente||"pruebas");
   f("cfgPago",c.tipoPago||"01");f("cfgContabilidad",String(!!c.obligadoContabilidad));
   f("cfgCertPath",c.p12Path);f("smtpHost",c.smtpHost);f("smtpPort",c.smtpPort||587);
