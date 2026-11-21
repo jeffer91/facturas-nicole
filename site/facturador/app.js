@@ -139,7 +139,7 @@ $("issue").addEventListener("click",async()=>{
   try{
     status("Generando XML, firmando con el certificado local y transmitiendo al SRI…");
     const result=await desktop.issue({
-      cliente:{tipo:selected.id_type,identificacion:selected.id_number,razonSocial:selected.full_name,email:selected.email||"",telefono:selected.phone||""},
+      cliente:{tipo:selected.id_type,identificacion:selected.id_number,razonSocial:selected.full_name,email:selected.email||"",direccion:selected.address||"",telefono:selected.phone||selected.mobile||""},
       items,p12Password:$("certPassword").value,confirmProduction:$("confirmReal").checked
     });
     $("certPassword").value="";
